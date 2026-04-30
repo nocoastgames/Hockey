@@ -82,9 +82,16 @@ export function ViewportGoalNet() {
   );
 }
 
-export function GoalieGlove({ className = '' }: { className?: string }) {
+export function GoalieGlove({ className = '', status = 'idle' }: { className?: string, status?: 'idle' | 'save' | 'miss' }) {
   return (
-    <svg className={className} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div className={`relative ${className}`}>
+      {status === 'save' && (
+        <div className="absolute inset-0 bg-emerald-400 rounded-full blur-2xl opacity-60 animate-ping z-0" />
+      )}
+      {status === 'miss' && (
+        <div className="absolute inset-0 bg-red-500 rounded-full blur-2xl opacity-60 animate-pulse z-0" />
+      )}
+      <svg className="relative z-10 w-full h-full" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* Glove brown leather base */}
       <path d="M 30 150 C 10 150, 20 60, 60 40 C 90 20, 130 20, 150 50 C 180 90, 190 140, 150 170 C 110 190, 50 180, 30 150 Z" fill="#B9975B" stroke="#0F172A" strokeWidth="8" />
       {/* Pocket webbing */}
@@ -92,7 +99,8 @@ export function GoalieGlove({ className = '' }: { className?: string }) {
       {/* Padding shape */}
       <path d="M 40 120 C 60 110, 80 120, 100 140" stroke="#0F172A" strokeWidth="6" strokeLinecap="round" />
       <circle cx="140" cy="140" r="15" fill="#C0C0C0" stroke="#0F172A" strokeWidth="4"/> 
-    </svg>
+      </svg>
+    </div>
   );
 }
 

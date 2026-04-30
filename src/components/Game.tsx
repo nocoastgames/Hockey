@@ -18,6 +18,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
   const [resultMessage, setResultMessage] = useState('');
   const [score, setScore] = useState(0);
   const [countdownNum, setCountdownNum] = useState(3);
+  const [gloveStatus, setGloveStatus] = useState<'idle' | 'save' | 'miss'>('idle');
   
   // Refs for collision
   const puckRef = useRef<HTMLDivElement>(null);
@@ -71,10 +72,11 @@ export function Game({ config, onOpenSettings }: GameProps) {
           x: [-80, 80],
           transition: { duration: 3.5, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }
         });
-        puckControls.start({ x: 0, y: 0, scale: 1 });
+        puckControls.start({ x: 0, y: 0, scale: 1, rotate: 0 });
       } else {
-        puckControls.start({ x: 0, y: 0, scale: 0.2 }); 
+        puckControls.start({ x: 0, y: 0, scale: 0.2, rotate: 0 }); 
         gloveControls.start({ x: "200%", y: "150%", rotate: 45, transition: { duration: 0 } }); 
+        setGloveStatus('idle');
       }
     }
   }, [gameState, config.mode]);
@@ -115,19 +117,31 @@ export function Game({ config, onOpenSettings }: GameProps) {
     });
 
     if (isGoal) {
+      // Shoot deep into the net
       await puckControls.start({
-        y: -450, x: currentTargetX, scale: 0.2,
-        transition: { duration: 0.5, ease: 'easeOut' }
+        y: -480, x: currentTargetX, scale: 0.15,
+        transition: { duration: 0.35, ease: 'easeIn' }
+      });
+      // Small bounce in the back of the net before calling goal
+      await puckControls.start({
+        y: -450, x: currentTargetX + (Math.random() > 0.5 ? 20 : -20), rotate: 45,
+        transition: { duration: 0.15, ease: 'easeOut' }
       });
       handleSuccess("GOAL!");
     } else {
+      // Hit the goalie
       await puckControls.start({
-        y: -350, x: currentTargetX, scale: 0.5, 
-        transition: { duration: 0.3, ease: 'easeOut' }
+        y: -360, x: finalGoalieX, scale: 0.35, 
+        transition: { duration: 0.25, ease: 'easeIn' }
       });
+      
+      playBlockSound();
+
+      // Bounce off aggressively
       await puckControls.start({
-        y: -150, x: currentTargetX + (Math.random() > 0.5 ? 200 : -200), scale: 0.8,
-        transition: { duration: 0.4, ease: 'easeOut' }
+        y: -50, x: finalGoalieX + (Math.random() > 0.5 ? 400 : -400), scale: 1.2,
+        rotate: (Math.random() > 0.5 ? 1 : -1) * 720,
+        transition: { duration: 0.5, ease: 'easeOut' }
       });
       handleFail("BLOCKED!");
     }
@@ -224,6 +238,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
         scale: 0.5,
         transition: { duration: 0.4, ease: "easeOut" }
       });
+      setGloveStatus('save');
       handleSuccess("GREAT SAVE!");
     } else {
       // Missed shot: glove goes wrong way
@@ -239,6 +254,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
         scale: 6,
         transition: { duration: 0.3, ease: 'easeIn' }
       });
+      setGloveStatus('miss');
       handleFail("OPPONENT SCORED!");
     }
   };
@@ -344,12 +360,14 @@ export function Game({ config, onOpenSettings }: GameProps) {
          {(gameState === 'approaching' || gameState === 'paused_in_zone' || gameState === 'action') && (
            <div 
              ref={blockZoneRef}
-             className={`absolute bottom-32 left-0 w-full h-40 border-y-8 flex items-center justify-center animate-pulse z-20 ${
-               gameState === 'paused_in_zone' ? 'border-amber-400 bg-amber-400/30' : 'border-emerald-500 bg-emerald-500/20'
+             className={`absolute bottom-32 left-0 w-full h-40 border-y-8 flex items-center justify-center z-20 transition-colors duration-300 ${
+               gameState === 'paused_in_zone' 
+                 ? 'border-yellow-300 bg-yellow-400/40 shadow-[0_0_40px_rgba(253,224,71,0.8)] animate-[pulse_0.4s_ease-in-out_infinite]' 
+                 : 'border-emerald-500 bg-emerald-500/20 animate-pulse'
              }`}
            >
              <h2 className={`font-black text-6xl md:text-8xl tracking-widest uppercase opacity-80 ${
-               gameState === 'paused_in_zone' ? 'text-amber-300' : 'text-emerald-300'
+               gameState === 'paused_in_zone' ? 'text-yellow-300 drop-shadow-[0_0_10px_rgba(253,224,71,0.8)]' : 'text-emerald-300'
              }`}>
                BLOCK ZONE
              </h2>
@@ -362,7 +380,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
            initial={{ x: "200%", y: "150%", rotate: 45 }}
            style={{ marginLeft: '-128px' }}
          >
-           <GoalieGlove className="w-full h-full drop-shadow-[0_20px_20px_rgba(0,0,0,0.8)]" />
+           <GoalieGlove className="w-full h-full drop-shadow-[0_20px_20px_rgba(0,0,0,0.8)]" status={gloveStatus} />
          </motion.div>
 
          {gameState === 'idle' && (
