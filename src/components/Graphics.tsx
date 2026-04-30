@@ -1,16 +1,26 @@
 export function RinkBg() {
   return (
     <svg className="absolute inset-0 w-full h-full text-white bg-slate-50" preserveAspectRatio="none" viewBox="0 0 1000 1000">
+      {/* Stands Area */}
+      <rect width="1000" height="250" fill="#0F172A" />
+      
+      {/* Boards top sill */}
+      <rect y="250" width="1000" height="20" fill="#FACC15" />
+      
+      {/* Dasher boards (white) */}
+      <rect y="270" width="1000" height="30" fill="#F8FAFC" />
+      <line x1="0" y1="300" x2="1000" y2="300" stroke="#CBD5E1" strokeWidth="4" />
+
       {/* Blue lines (crease outline etc) */}
-      <path d="M 300 100 C 300 250, 700 250, 700 100" fill="#E0F2FE" stroke="#0284C7" strokeWidth="8"/>
+      <path d="M 300 340 C 300 480, 700 480, 700 340" fill="#E0F2FE" stroke="#0284C7" strokeWidth="8"/>
       {/* Red goal line */}
-      <line x1="100" y1="100" x2="900" y2="100" stroke="#EF4444" strokeWidth="12" />
+      <line x1="0" y1="340" x2="1000" y2="340" stroke="#EF4444" strokeWidth="12" />
       
       {/* Center red line */}
       <line x1="0" y1="950" x2="1000" y2="950" stroke="#EF4444" strokeWidth="16" />
       {/* Faceoff circles */}
-      <circle cx="200" cy="500" r="80" stroke="#EF4444" strokeWidth="8" fill="none" />
-      <circle cx="800" cy="500" r="80" stroke="#EF4444" strokeWidth="8" fill="none" />
+      <circle cx="200" cy="650" r="80" stroke="#EF4444" strokeWidth="8" fill="none" />
+      <circle cx="800" cy="650" r="80" stroke="#EF4444" strokeWidth="8" fill="none" />
     </svg>
   );
 }
@@ -115,6 +125,43 @@ export function Stick75({ className = '' }: { className?: string }) {
       <path d="M 33 175 C 10 185 -10 190 -15 185 C -20 180 10 165 30 160" fill="#C0C0C0" stroke="#C0C0C0" strokeWidth="8" strokeLinejoin="round" />
       {/* Number 75 */}
       <text x="55" y="100" fill="#C0C0C0" fontSize="16" fontWeight="900" fontStyle="italic" transform="rotate(-73.6 55 95)" textAnchor="middle">75</text>
+    </svg>
+  );
+}
+
+const crowdPeople = Array.from({ length: 40 }).map((_, i) => ({
+  x: Math.random() * 1000,
+  y: 50 + Math.random() * 200,
+  delay: Math.random() * 0.5,
+  color: ['#0284C7', '#EF4444', '#B9975B', '#64748B', '#CBD5E1'][Math.floor(Math.random() * 5)]
+})).sort((a, b) => a.y - b.y); // Sort by Y so people in front overlap those behind
+
+export function CrowdSVG({ className = '', isCheering = false }: { className?: string, isCheering?: boolean }) {
+  return (
+    <svg className={className} viewBox="0 0 1000 250" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      {crowdPeople.map((p, i) => (
+        <g key={i} style={{ transformOrigin: `${p.x}px ${p.y}px`, animation: isCheering ? `cheer 0.6s ease-in-out infinite ${p.delay}s alternate` : `idleCheer 3s ease-in-out infinite ${p.delay}s alternate` }}>
+          {/* Body */}
+          <circle cx={p.x} cy={p.y} r="20" fill={p.color} />
+          {/* Head */}
+          <circle cx={p.x} cy={p.y - 30} r="15" fill="#E2E8F0" />
+          {/* Arms */}
+          <path d={`M ${p.x - 15} ${p.y} Q ${p.x - 30} ${p.y - (isCheering ? 40 : 10)} ${p.x - 20} ${p.y - (isCheering ? 60 : 20)}`} stroke={p.color} strokeWidth="8" strokeLinecap="round" fill="none" />
+          <path d={`M ${p.x + 15} ${p.y} Q ${p.x + 30} ${p.y - (isCheering ? 40 : 10)} ${p.x + 20} ${p.y - (isCheering ? 60 : 20)}`} stroke={p.color} strokeWidth="8" strokeLinecap="round" fill="none" />
+        </g>
+      ))}
+      <style>
+        {`
+          @keyframes cheer {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-30px); }
+          }
+          @keyframes idleCheer {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-5px); }
+          }
+        `}
+      </style>
     </svg>
   );
 }

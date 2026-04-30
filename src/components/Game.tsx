@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation, useMotionValue } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { RinkBg, RinkBgGoalieView, ViewportGoalNet, NetSVG, PuckSVG, KnightHelmet, Stick75, GoalieGlove } from './Graphics';
+import { RinkBg, RinkBgGoalieView, ViewportGoalNet, NetSVG, PuckSVG, KnightHelmet, Stick75, GoalieGlove, CrowdSVG } from './Graphics';
 import { GameConfig } from './Settings';
 import { playShootSound, playGoalSound, playBlockSound, playBuzzer, playMissSound } from '../lib/audio';
 import { Settings as SettingsIcon } from 'lucide-react';
@@ -120,17 +120,23 @@ export function Game({ config, onOpenSettings }: GameProps) {
       transition: { duration: 0.5, ease: 'easeOut' }
     });
 
+    const wh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const baseDistance = -(wh - 350);
+    const distToGoalie = baseDistance;
+    const distToNet = baseDistance - 140;
+    const distToBoards = baseDistance - 190;
+
     if (isGoal) {
       // Shoot deep into the net and stay there
       await puckControls.start({
-        y: -500, x: currentTargetX, scale: 0.12,
+        y: distToNet, x: currentTargetX, scale: 0.12,
         transition: { duration: 0.35, ease: 'easeIn' }
       });
       handleSuccess("GOAL!");
     } else if (isMissedNet) {
       // Shoot past the net into the boards
       await puckControls.start({
-        y: -550, x: currentTargetX * 1.5, scale: 0.1,
+        y: distToBoards, x: currentTargetX * 1.5, scale: 0.1,
         transition: { duration: 0.35, ease: 'easeIn' }
       });
       
@@ -138,7 +144,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
 
       // Bounce off boards
       await puckControls.start({
-        y: -300, x: currentTargetX > 0 ? 100 : -100, scale: 0.2,
+        y: baseDistance + 60, x: currentTargetX > 0 ? 100 : -100, scale: 0.2,
         rotate: (Math.random() > 0.5 ? 1 : -1) * 720,
         transition: { duration: 0.5, ease: 'easeOut' }
       });
@@ -146,7 +152,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
     } else {
       // Hit the goalie
       await puckControls.start({
-        y: -360, x: finalGoalieX, scale: 0.35, 
+        y: distToGoalie, x: finalGoalieX, scale: 0.35, 
         transition: { duration: 0.25, ease: 'easeIn' }
       });
       
@@ -154,7 +160,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
 
       // Bounce off aggressively
       await puckControls.start({
-        y: -50, x: finalGoalieX + (Math.random() > 0.5 ? 400 : -400), scale: 1.2,
+        y: baseDistance + 310, x: finalGoalieX + (Math.random() > 0.5 ? 400 : -400), scale: 1.2,
         rotate: (Math.random() > 0.5 ? 1 : -1) * 720,
         transition: { duration: 0.5, ease: 'easeOut' }
       });
@@ -293,6 +299,9 @@ export function Game({ config, onOpenSettings }: GameProps) {
   const renderScoreMode = () => (
     <>
       <RinkBg />
+      <div className="absolute top-0 w-full h-[25%] z-0 opacity-80 pointer-events-none">
+        <CrowdSVG className="w-full h-full" isCheering={gameState === 'result' && resultMessage === 'GOAL!'} />
+      </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
          <div className="relative mt-20">
            <div className="w-80 h-40 relative z-0">
