@@ -3,7 +3,7 @@ import { motion, useAnimation, useMotionValue } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { RinkBg, RinkBgGoalieView, ViewportGoalNet, NetSVG, PuckSVG, KnightHelmet, Stick75, GoalieGlove } from './Graphics';
 import { GameConfig } from './Settings';
-import { playShootSound, playGoalSound, playBlockSound, playBuzzer } from '../lib/audio';
+import { playShootSound, playGoalSound, playBlockSound, playBuzzer, playMissSound } from '../lib/audio';
 import { Settings as SettingsIcon } from 'lucide-react';
 
 interface GameProps {
@@ -134,7 +134,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
         transition: { duration: 0.35, ease: 'easeIn' }
       });
       
-      playBlockSound(); // Sounds like hitting the boards
+      playMissSound();
 
       // Bounce off boards
       await puckControls.start({

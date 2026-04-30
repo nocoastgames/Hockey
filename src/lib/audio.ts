@@ -95,3 +95,34 @@ export function playBuzzer() {
   osc.start(audioCtx.currentTime);
   osc.stop(audioCtx.currentTime + 0.6);
 }
+
+export function playMissSound() {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  const osc1 = audioCtx.createOscillator();
+  const osc2 = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  
+  osc1.type = 'sawtooth';
+  osc2.type = 'square';
+  
+  osc1.connect(gain);
+  osc2.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  // Dissonant interval for a "wrong" / miss sound
+  osc1.frequency.setValueAtTime(300, audioCtx.currentTime);
+  osc2.frequency.setValueAtTime(290, audioCtx.currentTime);
+  
+  osc1.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+  osc2.frequency.exponentialRampToValueAtTime(95, audioCtx.currentTime + 0.3);
+  
+  gain.gain.setValueAtTime(0, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+  
+  osc1.start(audioCtx.currentTime);
+  osc2.start(audioCtx.currentTime);
+  osc1.stop(audioCtx.currentTime + 0.3);
+  osc2.stop(audioCtx.currentTime + 0.3);
+}
