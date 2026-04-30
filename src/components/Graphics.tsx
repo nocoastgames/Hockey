@@ -104,7 +104,7 @@ export function GoalieGlove({ className = '', status = 'idle' }: { className?: s
   );
 }
 
-export function Stick47({ className = '' }: { className?: string }) {
+export function Stick75({ className = '' }: { className?: string }) {
   return (
     <svg className={className} viewBox="-20 0 120 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* Shaft */}
@@ -113,8 +113,8 @@ export function Stick47({ className = '' }: { className?: string }) {
       <path d="M 80 10 L 67 46" stroke="#C0C0C0" strokeWidth="18" strokeLinecap="round" />
       {/* Blade */}
       <path d="M 33 175 C 10 185 -10 190 -15 185 C -20 180 10 165 30 160" fill="#C0C0C0" stroke="#C0C0C0" strokeWidth="8" strokeLinejoin="round" />
-      {/* Number 47 */}
-      <text x="55" y="100" fill="#C0C0C0" fontSize="16" fontWeight="900" fontStyle="italic" transform="rotate(-73.6 55 95)" textAnchor="middle">47</text>
+      {/* Number 75 */}
+      <text x="55" y="100" fill="#C0C0C0" fontSize="16" fontWeight="900" fontStyle="italic" transform="rotate(-73.6 55 95)" textAnchor="middle">75</text>
     </svg>
   );
 }

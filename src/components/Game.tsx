@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation, useMotionValue } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { RinkBg, RinkBgGoalieView, ViewportGoalNet, NetSVG, PuckSVG, KnightHelmet, Stick47, GoalieGlove } from './Graphics';
+import { RinkBg, RinkBgGoalieView, ViewportGoalNet, NetSVG, PuckSVG, KnightHelmet, Stick75, GoalieGlove } from './Graphics';
 import { GameConfig } from './Settings';
 import { playShootSound, playGoalSound, playBlockSound, playBuzzer } from '../lib/audio';
 import { Settings as SettingsIcon } from 'lucide-react';
@@ -117,15 +117,10 @@ export function Game({ config, onOpenSettings }: GameProps) {
     });
 
     if (isGoal) {
-      // Shoot deep into the net
+      // Shoot deep into the net and stay there
       await puckControls.start({
-        y: -480, x: currentTargetX, scale: 0.15,
+        y: -500, x: currentTargetX, scale: 0.12,
         transition: { duration: 0.35, ease: 'easeIn' }
-      });
-      // Small bounce in the back of the net before calling goal
-      await puckControls.start({
-        y: -450, x: currentTargetX + (Math.random() > 0.5 ? 20 : -20), rotate: 45,
-        transition: { duration: 0.15, ease: 'easeOut' }
       });
       handleSuccess("GOAL!");
     } else {
@@ -318,7 +313,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
                initial={{ rotate: 0 }}
                animate={stickControls}
              >
-               <Stick47 className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" />
+               <Stick75 className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" />
              </motion.div>
            )}
 
@@ -346,7 +341,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none overflow-hidden">
          <div className="absolute top-[10%] left-1/2 -ml-12 w-24 h-24 z-0 opacity-90">
            <KnightHelmet className="w-full h-full drop-shadow-xl" isGoalie={false} />
-           <Stick47 className="absolute -right-12 bottom-0 w-20 h-32 rotate-12" />
+           <Stick75 className="absolute -right-12 bottom-0 w-20 h-32 rotate-12" />
          </div>
          
          <motion.div 
