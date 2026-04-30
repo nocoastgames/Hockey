@@ -121,10 +121,10 @@ export function Game({ config, onOpenSettings }: GameProps) {
     });
 
     const wh = typeof window !== 'undefined' ? window.innerHeight : 800;
-    const baseDistance = -(wh - 350);
-    const distToGoalie = baseDistance;
-    const distToNet = baseDistance - 140;
-    const distToBoards = baseDistance - 190;
+    const baseDistance = -0.54 * wh;
+    const distToGoalie = baseDistance + 20;
+    const distToNet = baseDistance - 20;
+    const distToBoards = baseDistance - 80;
 
     if (isGoal) {
       // Shoot deep into the net and stay there
@@ -302,8 +302,8 @@ export function Game({ config, onOpenSettings }: GameProps) {
       <div className="absolute top-0 w-full h-[25%] z-0 opacity-80 pointer-events-none">
         <CrowdSVG className="w-full h-full" isCheering={gameState === 'result' && resultMessage === 'GOAL!'} />
       </div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-         <div className="relative mt-20">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+         <div className="absolute w-full flex justify-center z-10" style={{ top: 'calc(34vh - 100px)' }}>
            <div className="w-80 h-40 relative z-0">
              <NetSVG className="w-full h-full drop-shadow-2xl" />
            </div>
@@ -327,37 +327,35 @@ export function Game({ config, onOpenSettings }: GameProps) {
            )}
          </div>
 
-         <div className="flex-1 w-full relative">
-           <motion.div 
-             className="absolute left-1/2 bottom-20 -ml-10 w-20 h-16 z-30"
-             animate={puckControls}
-             initial={{ y: 0, x: 0 }}
+         <motion.div 
+           className="absolute left-1/2 bottom-[12vh] -ml-10 w-20 h-16 z-30"
+           animate={puckControls}
+           initial={{ y: 0, x: 0 }}
+         >
+           <PuckSVG className="w-full h-full drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]" />
+         </motion.div>
+
+         {config.mode === 'score' && (
+           <motion.div
+             className="absolute left-1/2 bottom-[12vh] ml-2 w-24 h-48 z-40 origin-bottom-right"
+             initial={{ rotate: 0 }}
+             animate={stickControls}
            >
-             <PuckSVG className="w-full h-full drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]" />
+             <Stick75 className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" />
            </motion.div>
+         )}
 
-           {config.mode === 'score' && (
-             <motion.div
-               className="absolute left-1/2 bottom-20 ml-2 w-24 h-48 z-40 origin-bottom-right"
-               initial={{ rotate: 0 }}
-               animate={stickControls}
-             >
-               <Stick75 className="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" />
-             </motion.div>
-           )}
-
-           {gameState === 'idle' && (
-             <motion.div 
-               className="absolute bottom-40 w-full text-center z-40"
-               animate={{ opacity: [0.3, 1, 0.3], scale: [0.95, 1.05, 0.95] }}
-               transition={{ duration: 1.5, repeat: Infinity }}
-             >
-               <h2 className="text-4xl font-black text-amber-500 drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] px-4 bg-slate-900/50 rounded-full inline-block py-2 border-2 border-amber-500/50">
-                 PRESS SWITCH TO SHOOT!
-               </h2>
-             </motion.div>
-           )}
-         </div>
+         {gameState === 'idle' && (
+           <motion.div 
+             className="absolute bottom-[25vh] w-full text-center z-40"
+             animate={{ opacity: [0.3, 1, 0.3], scale: [0.95, 1.05, 0.95] }}
+             transition={{ duration: 1.5, repeat: Infinity }}
+           >
+             <h2 className="text-4xl font-black text-amber-500 drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] px-4 bg-slate-900/50 rounded-full inline-block py-2 border-2 border-amber-500/50">
+               PRESS SWITCH TO SHOOT!
+             </h2>
+           </motion.div>
+         )}
       </div>
     </>
   );
