@@ -65,7 +65,7 @@ export function Game({ config, onOpenSettings }: GameProps) {
     if (gameState === 'idle') {
       if (config.mode === 'score') {
         crosshairControls.start({
-          x: [-150, 150],
+          x: [-180, 180],
           transition: { duration: 2, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }
         });
         goalieControls.start({
@@ -92,9 +92,13 @@ export function Game({ config, onOpenSettings }: GameProps) {
     const currentGoalieX = goalieX.get();
     
     let isGoal = true;
+    let isMissedNet = false;
     let finalGoalieX = currentGoalieX;
     
-    if (isErrorless) {
+    if (Math.abs(currentTargetX) > 135) {
+      isMissedNet = true;
+      isGoal = false;
+    } else if (isErrorless) {
       isGoal = true;
       finalGoalieX = currentTargetX > 0 ? -100 : 100;
     } else {
@@ -123,6 +127,22 @@ export function Game({ config, onOpenSettings }: GameProps) {
         transition: { duration: 0.35, ease: 'easeIn' }
       });
       handleSuccess("GOAL!");
+    } else if (isMissedNet) {
+      // Shoot past the net into the boards
+      await puckControls.start({
+        y: -550, x: currentTargetX * 1.5, scale: 0.1,
+        transition: { duration: 0.35, ease: 'easeIn' }
+      });
+      
+      playBlockSound(); // Sounds like hitting the boards
+
+      // Bounce off boards
+      await puckControls.start({
+        y: -300, x: currentTargetX > 0 ? 100 : -100, scale: 0.2,
+        rotate: (Math.random() > 0.5 ? 1 : -1) * 720,
+        transition: { duration: 0.5, ease: 'easeOut' }
+      });
+      handleFail("MISSED!");
     } else {
       // Hit the goalie
       await puckControls.start({

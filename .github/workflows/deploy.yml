@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master # In case the default branch is master
+  workflow_dispatch:
 
 permissions:
   contents: read
